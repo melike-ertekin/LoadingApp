@@ -3,13 +3,16 @@ import android.app.*
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.loadingapp.viewmodel.MainViewModel
 import com.example.loadingapp.viewmodel.MainViewModelFactory
 import com.example.loadingapp.databinding.ActivityMainBinding
+import kotlin.properties.Delegates
 
 
 class MainActivity : AppCompatActivity() {
@@ -33,7 +36,19 @@ class MainActivity : AppCompatActivity() {
         mainViewModelFactory = MainViewModelFactory(application)
         mainViewModel = ViewModelProvider(this, mainViewModelFactory).get(MainViewModel::class.java)
         activityMainBinding.contentMain.mainViewModel = mainViewModel
-       // activityMainBinding.lifecycleOwner = this
+        activityMainBinding.lifecycleOwner = this
+
+        activityMainBinding.contentMain.customButton.setOnClickListener{
+            Log.d("customButton","clicked")
+            activityMainBinding.contentMain.customButton.buttonState = ButtonState.Loading
+
+            mainViewModel.download()
+        }
+
+        mainViewModel.downloadCompleted.observe(this, Observer {
+            activityMainBinding.contentMain.customButton.buttonState = ButtonState.Completed
+        })
+
 
 
 
